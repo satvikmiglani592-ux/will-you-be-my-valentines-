@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Will you be my valentine?</title>
+  <meta name="theme-color" content="#ffd8e6" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#ffd8e6;
+      --accent:#ff5d8f;
+      --muted:rgba(0,0,0,0.55);
+      --btn-bg:rgba(255,255,255,0.95);
+      --card-max:760px;
+      --touch-min:48px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:var(--bg);
+      font-family:'Poppins',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:20px; /* ensure spacing on very small viewports */
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .card{
+      text-align:center;
+      padding:clamp(20px,4vw,48px) clamp(16px,6vw,36px);
+      border-radius:18px;
+      backdrop-filter:blur(4px);
+      max-width:var(--card-max);
+      width:100%;
+      box-shadow:0 10px 40px rgba(0,0,0,0.08);
+      background:linear-gradient(180deg,rgba(255,255,255,0.25),rgba(255,255,255,0.12));
+    }
+
+    /* top gif */
+    .top-gif{display:flex;justify-content:center;margin-bottom:12px}
+    .top-gif img{
+      width:min(34vw,120px);
+      max-width:120px;
+      height:auto;
+      border-radius:12px;
+      box-shadow:0 8px 30px rgba(255,93,143,0.06);
+      display:block;
+    }
+
+    h1.question{
+      margin:0 0 12px 0;
+      font-size:clamp(20px,5.2vw,28px);
+      color:var(--muted);
+      font-weight:700;
+      letter-spacing:0.2px;
+    }
+    .sub{
+      color:rgba(0,0,0,0.45);
+      margin-bottom:18px;
+      font-size:clamp(13px,2.6vw,16px);
+    }
+
+    .buttons{
+      display:flex;
+      gap:14px;
+      justify-content:center;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+    button.btn{
+      -webkit-user-select:none;
+      user-select:none;
+      touch-action:manipulation;
+      border:0;
+      padding:14px 26px;
+      font-size:16px;
+      border-radius:999px;
+      cursor:pointer;
+      box-shadow:0 6px 18px rgba(0,0,0,0.08);
+      transition:transform 180ms ease,box-shadow 180ms ease;
+      background:var(--btn-bg);
+      color:var(--accent);
+      font-weight:600;
+      min-height:var(--touch-min);
+      min-width:120px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+    button.btn:active{transform:translateY(2px)}
+    button.yes{
+      border:2px solid rgba(255,93,143,0.12);
+      background:linear-gradient(180deg,#fff0f6,#ffffff);
+      color:var(--accent);
+    }
+    button.no{
+      border:2px solid rgba(0,0,0,0.06);
+      background:#fff;
+      color:rgba(0,0,0,0.75);
+    }
+
+    .message{
+      min-height:22px;
+      color:rgba(0,0,0,0.6);
+      font-weight:600;
+      margin-top:8px;
+      opacity:0.95;
+      transition:transform 200ms ease,opacity 200ms ease;
+    }
+    .message.pop{transform:translateY(-6px);opacity:1}
+
+    /* success screen (permanent) */
+    .success-screen{
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(180deg,#fff8fb,#ffeef4);
+      z-index:1500;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity 280ms ease;
+    }
+    .success-screen.show{opacity:1;pointer-events:auto}
+    .success-card{
+      max-width:720px;
+      width:92%;
+      text-align:center;
+      padding:24px;
+      border-radius:18px;
+      box-shadow:0 18px 48px rgba(0,0,0,0.14);
+      background:linear-gradient(180deg,#fff,#fff6fb);
+    }
+    .success-card h2{
+      color:var(--accent);
+      margin:0 0 12px 0;
+      font-size:clamp(20px,4.5vw,28px);
+    }
+    .success-card img{
+      max-width:100%;
+      height:auto;
+      border-radius:12px;
+      box-shadow:0 8px 30px rgba(255,93,143,0.08);
+      display:block;
+      margin:12px auto 0;
+    }
+    .back{
+      margin-top:14px;
+      display:inline-block;
+      border-radius:999px;
+      padding:10px 16px;
+      background:rgba(255,255,255,0.9);
+      border:1px solid rgba(0,0,0,0.06);
+      cursor:pointer;
+      font-weight:600;
+      color:rgba(0,0,0,0.65);
+      min-height:var(--touch-min);
+      min-width:88px;
+    }
+
+    /* hearts (full-screen) */
+    .heart{
+      position:fixed;
+      pointer-events:none;
+      font-size:20px;
+      will-change:transform,opacity;
+      animation-timing-function:ease-out;
+      text-shadow:0 2px 6px rgba(0,0,0,0.08);
+      z-index:1600;
+    }
+    @keyframes floatUpRandom{
+      0%{transform:translateY(0) scale(1);opacity:1}
+      100%{transform:translateY(-140vh) rotate(20deg) scale(1.4);opacity:0}
+    }
+
+    /* responsive: stack buttons on small screens */
+    @media (max-width:420px){
+      .card{padding:18px}
+      .top-gif img{width:min(38vw,90px);max-width:90px}
+      .buttons{flex-direction:column;gap:10px}
+      button.btn{width:100%;max-width:360px;padding:12px 18px}
+      .sub{margin-bottom:12px}
+    }
+
+    /* prefer reduced motion: disable heavy animations and hearts */
+    @media (prefers-reduced-motion: reduce){
+      .heart{display:none !important}
+      *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important}
+    }
+  </style>
+</head>
+<body>
+  <div class="card" role="main">
+    <!-- top gif that changes with responses -->
+    <div class="top-gif">
+      <!-- lazy-loaded responsive gif -->
+      <img id="topGif" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMzhtZHZhb250N253Y3l6ZmMyMWliOGh5c2dobWZqNzF3cTlxaXlwcyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/GaW7Duawe9YHuGrYlc/giphy.gif"
+           alt="proposing" loading="lazy" />
+    </div>
+
+    <h1 class="question">Will you be my valentine, doctor sahiba?</h1>
+    <div class="sub">(choose carefully — there are consequences 💖)</div>
+
+    <div class="buttons">
+      <button id="yesBtn" class="btn yes" aria-pressed="false">Yes</button>
+      <button id="noBtn" class="btn no">No</button>
+    </div>
+
+    <div id="msg" class="message" aria-live="polite"></div>
+  </div>
+
+  <!-- Permanent success screen that replaces the page on Yes -->
+  <div id="successScreen" class="success-screen" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="successTitle">
+    <div class="success-card" role="document">
+      <h2 id="successTitle">Yayy, me happy happy</h2>
+      <img id="successGif" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExb2NsNmc3MGozODdnejJxOGI3N3VyYzBubWM4a2EycHRyenl0cHBxeCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/iaP3wqaJYPTeD9RDx5/giphy.gif"
+           alt="Hearts and celebration" loading="lazy" />
+      <div>
+        <button id="backBtn" class="back">Back</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn = document.getElementById('noBtn');
+    const msg = document.getElementById('msg');
+    const topGif = document.getElementById('topGif');
+    const successScreen = document.getElementById('successScreen');
+    const backBtn = document.getElementById('backBtn');
+
+    // gifs for states
+    const stressedGif = 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMzhtZHZhb250N253Y3l6ZmMyMWliOGh5c2dobWZqNzF3cTlxaXlwcyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/GaW7Duawe9YHuGrYlc/giphy.gif';
+    const happyGif = 'https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbWhtZXd6YmgxZm80YWg2ZjEyYnhxOGg5ZWsyaTIxYmxobDhvcnBnbSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ufER859OhfRMOMlb14/giphy.gif';
+    const sadGif = 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMGkwZWMyZ2l2c3djOW5qMmVtb29iaHpsN2FpeDF6c3Rqa3ZnZ3htOCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/BDRwttjma1SeElPbno/giphy.gif';
+
+    // yes growth state triggered by NO clicks
+    let yesScale = 1;
+    // ensure hearts spawn only once per success view
+    let heartsSpawned = false;
+
+    // utility: determine whether to run heavy animation (disable on small screens)
+    function prefersReducedMotion(){
+      return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }
+    function limitHeartsByViewport(requested){
+      const w = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+      // on narrow screens, reduce hearts dramatically for performance
+      if(w < 420) return Math.min(requested, 40);
+      if(w < 768) return Math.min(requested, 80);
+      return requested;
+    }
+
+    // Yes: show permanent success screen and spawn hearts once
+    yesBtn.addEventListener('click', () => {
+      if(successScreen.classList.contains('show')) return;
+      yesBtn.setAttribute('aria-pressed', 'true');
+      topGif.src = happyGif;
+
+      const card = document.querySelector('.card');
+      if(card) card.style.display = 'none';
+
+      successScreen.classList.add('show');
+      successScreen.setAttribute('aria-hidden', 'false');
+
+      // Move focus into the dialog for keyboard users
+      backBtn.focus();
+
+      if(!heartsSpawned && !prefersReducedMotion()){
+        heartsSpawned = true;
+        spawnFullScreenHearts(limitHeartsByViewport(120));
+      }
+    });
+
+    // Back: return to original state
+    backBtn.addEventListener('click', () => {
+      // hide success screen
+      successScreen.classList.remove('show');
+      successScreen.setAttribute('aria-hidden', 'true');
+
+      // show original card
+      const card = document.querySelector('.card');
+      if(card) card.style.display = '';
+
+      // reset state
+      heartsSpawned = false;
+      yesScale = 1;
+      yesBtn.style.transform = 'scale(1)';
+      noBtn.textContent = 'No';
+      msg.textContent = '';
+      topGif.src = stressedGif;
+
+      // remove any leftover hearts
+      document.querySelectorAll('.heart').forEach(h => h.remove());
+
+      yesBtn.focus();
+    });
+
+    // NO button behavior: cycles replies and makes YES larger (no hearts)
+    const funnyReplies = [
+      'Nope? Are you allergic to romance?',
+      "Really? I'll bribe you with chocolate!",
+      "Okay but I'm bringing puppies anyway.",
+      'Press again to retract your answer.',
+      'Who taught you to say no to hugs?',
+      "Fine. But you're missing out on cute smiles."
+    ];
+    let noIndex = 0;
+    noBtn.addEventListener('click', () => {
+      const next = funnyReplies[noIndex % funnyReplies.length];
+      noBtn.textContent = next;
+      noIndex++;
+
+      yesScale = Math.min(yesScale + 0.22, 4);
+      yesBtn.style.transform = `scale(${yesScale})`;
+
+      topGif.src = sadGif;
+    });
+
+    // spawn hearts across the whole viewport (staggered)
+    function spawnFullScreenHearts(total){
+      // safety: cap total
+      const capped = Math.max(0, Math.min(total, 300));
+      // stagger creation over a short window so mobile isn't overwhelmed
+      const burstWindow = Math.min(2000, 500 + capped * 20);
+      for(let i=0;i<capped;i++){
+        setTimeout(()=> createFullScreenHeart(), Math.random() * burstWindow);
+      }
+    }
+
+    function createFullScreenHeart(){
+      const el = document.createElement('div');
+      el.className = 'heart';
+      el.textContent = ['💖','💘','💝','❤','💕'][Math.floor(Math.random()*5)];
+      document.body.appendChild(el);
+
+      const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+      const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+
+      // randomize start position; keep inside viewport
+      const left = Math.random() * (vw - 40) + 10;
+      const startTop = Math.random() * (vh - 40) + 10;
+      el.style.left = left + 'px';
+      el.style.top = startTop + 'px';
+
+      const size = 12 + Math.random() * 36;
+      el.style.fontSize = size + 'px';
+
+      // shorter duration on small screens
+      const durBase = (vw < 420) ? 1200 : 1400;
+      const dur = durBase + Math.floor(Math.random() * 2000);
+      el.style.animation = `floatUpRandom ${dur}ms ease-out forwards`;
+      el.style.transform = `rotate(${Math.random() * 60 - 30}deg)`;
+
+      // cleanup after animation
+      setTimeout(()=> el.remove(), dur + 300);
+    }
+
+    // keyboard support for buttons (Enter triggers)
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter'){
+        const active = document.activeElement;
+        if(active === yesBtn) yesBtn.click();
+        if(active === noBtn) noBtn.click();
+        if(active === backBtn) backBtn.click();
+      }
+      // close dialog with Escape
+      if(e.key === 'Escape' && successScreen.classList.contains('show')){
+        backBtn.click();
+      }
+    });
+
+    // initial focus
+    yesBtn.focus();
+  </script>
+</body>
+</html>
