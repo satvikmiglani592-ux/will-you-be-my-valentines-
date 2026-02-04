@@ -30,6 +30,7 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    /* container card: allow scrolling if viewport is tiny */
     .card{
       text-align:center;
       padding:clamp(20px,4vw,48px) clamp(16px,6vw,36px);
@@ -39,6 +40,9 @@
       width:100%;
       box-shadow:0 10px 40px rgba(0,0,0,0.08);
       background:linear-gradient(180deg,rgba(255,255,255,0.25),rgba(255,255,255,0.12));
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     /* top gif */
@@ -127,6 +131,8 @@
       opacity:0;
       pointer-events:none;
       transition:opacity 280ms ease;
+      /* safe area padding for phones with notches */
+      padding: env(safe-area-inset-top,20px) env(safe-area-inset-right,20px) env(safe-area-inset-bottom,20px) env(safe-area-inset-left,20px);
     }
     .success-screen.show{opacity:1;pointer-events:auto}
     .success-card{
@@ -137,19 +143,28 @@
       border-radius:18px;
       box-shadow:0 18px 48px rgba(0,0,0,0.14);
       background:linear-gradient(180deg,#fff,#fff6fb);
+      /* keep success card scrollable on short screens */
+      max-height: calc(100vh - 80px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 18px;
     }
     .success-card h2{
       color:var(--accent);
       margin:0 0 12px 0;
       font-size:clamp(20px,4.5vw,28px);
     }
+    /* constrain gif height so it won't push footer off-screen */
     .success-card img{
       max-width:100%;
+      width:auto;
       height:auto;
+      max-height:40vh;
       border-radius:12px;
       box-shadow:0 8px 30px rgba(255,93,143,0.08);
       display:block;
       margin:12px auto 0;
+      object-fit:cover;
     }
     .back{
       margin-top:14px;
@@ -165,6 +180,16 @@
       min-width:88px;
     }
 
+    /* slightly tighter spacing for very small screens */
+    @media (max-width:420px){
+      .card{padding:18px}
+      .top-gif img{width:min(38vw,90px);max-width:90px}
+      .buttons{flex-direction:column;gap:10px}
+      button.btn{width:100%;max-width:360px;padding:12px 18px}
+      .sub{margin-bottom:12px}
+      .success-card{padding:18px}
+    }
+
     /* hearts (full-screen) */
     .heart{
       position:fixed;
@@ -178,15 +203,6 @@
     @keyframes floatUpRandom{
       0%{transform:translateY(0) scale(1);opacity:1}
       100%{transform:translateY(-140vh) rotate(20deg) scale(1.4);opacity:0}
-    }
-
-    /* responsive: stack buttons on small screens */
-    @media (max-width:420px){
-      .card{padding:18px}
-      .top-gif img{width:min(38vw,90px);max-width:90px}
-      .buttons{flex-direction:column;gap:10px}
-      button.btn{width:100%;max-width:360px;padding:12px 18px}
-      .sub{margin-bottom:12px}
     }
 
     /* prefer reduced motion: disable heavy animations and hearts */
@@ -219,7 +235,8 @@
   <!-- Permanent success screen that replaces the page on Yes -->
   <div id="successScreen" class="success-screen" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="successTitle">
     <div class="success-card" role="document">
-      <h2 id="successTitle">Yayy, me happy happy</h2>
+      <h2 id="successTitle">I love you so so so much my chaand si mehbooba </h2>
+      <h2 id="successSubtitle">Infinity se bhi jyada </h2>
       <img id="successGif" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExb2NsNmc3MGozODdnejJxOGI3N3VyYzBubWM4a2EycHRyenl0cHBxeCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/iaP3wqaJYPTeD9RDx5/giphy.gif"
            alt="Hearts and celebration" loading="lazy" />
       <div>
